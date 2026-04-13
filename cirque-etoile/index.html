@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cirque Etoile — A Modern Circus Without Animals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Lato', sans-serif;
+      background: #0d0d1a;
+      color: #e8e0d4;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    /* ── Color Tokens ── */
+    :root {
+      --navy: #111133;
+      --navy-dark: #0d0d1a;
+      --gold: #c9a84c;
+      --gold-light: #e0c97f;
+      --gold-dim: rgba(201,168,76,0.25);
+      --cream: #e8e0d4;
+      --white: #ffffff;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--navy-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 4px; }
+
+    /* ── Navigation ── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 3rem;
+      background: rgba(13,13,26,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--gold-dim);
+      transition: padding 0.3s;
+    }
+    .navbar.scrolled { padding: 0.6rem 3rem; }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .nav-brand svg { height: 38px; width: auto; }
+    .nav-brand span {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--cream);
+      transition: color 0.3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--gold);
+      transition: width 0.3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-links a:hover::after { width: 100%; }
+    .btn-tickets {
+      padding: 0.55rem 1.5rem;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-size: 0.8rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border-radius: 2px;
+      transition: all 0.3s;
+      cursor: pointer;
+      background: transparent;
+    }
+    .btn-tickets:hover {
+      background: var(--gold);
+      color: var(--navy-dark);
+    }
+
+    /* Mobile menu */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .menu-toggle span {
+      width: 24px; height: 2px;
+      background: var(--gold);
+      transition: 0.3s;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: url('images/hero.jpg') center/cover no-repeat;
+      filter: brightness(0.45);
+      transform: scale(1.05);
+      transition: transform 8s ease-out;
+    }
+    .hero:hover .hero-bg { transform: scale(1); }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(13,13,26,0.6) 0%,
+        rgba(13,13,26,0.3) 40%,
+        rgba(13,13,26,0.7) 100%
+      );
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      padding: 2rem;
+    }
+    .hero-content h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 400;
+      color: var(--white);
+      letter-spacing: 4px;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 30px rgba(0,0,0,0.5);
+    }
+    .hero-content p {
+      font-size: 1.1rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--cream);
+      margin-bottom: 2.5rem;
+      opacity: 0.9;
+    }
+    .hero-cta {
+      display: inline-block;
+      padding: 0.9rem 2.5rem;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: all 0.3s;
+    }
+    .hero-cta:hover {
+      background: var(--gold);
+      color: var(--navy-dark);
+    }
+
+    /* ── Decorative Stars (CSS) ── */
+    .stars-decoration {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .stars-decoration span {
+      position: absolute;
+      width: 3px; height: 3px;
+      background: var(--gold-light);
+      border-radius: 50%;
+      animation: twinkle 3s infinite alternate;
+    }
+    .stars-decoration span:nth-child(1) { top: 15%; left: 10%; animation-delay: 0s; }
+    .stars-decoration span:nth-child(2) { top: 25%; left: 85%; animation-delay: 0.5s; }
+    .stars-decoration span:nth-child(3) { top: 60%; left: 5%; animation-delay: 1s; }
+    .stars-decoration span:nth-child(4) { top: 70%; left: 90%; animation-delay: 1.5s; }
+    .stars-decoration span:nth-child(5) { top: 40%; left: 50%; animation-delay: 2s; }
+    .stars-decoration span:nth-child(6) { top: 10%; left: 60%; animation-delay: 0.8s; }
+    .stars-decoration span:nth-child(7) { top: 80%; left: 30%; animation-delay: 2.2s; }
+    .stars-decoration span:nth-child(8) { top: 50%; left: 75%; animation-delay: 1.2s; }
+    @keyframes twinkle {
+      0% { opacity: 0.3; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.8); }
+    }
+
+    /* ── Sections ── */
+    section { padding: 6rem 2rem; }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      text-align: center;
+      color: var(--white);
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+    }
+    .section-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+    .section-divider::before,
+    .section-divider::after {
+      content: '';
+      width: 60px; height: 1px;
+      background: var(--gold);
+    }
+    .section-divider svg { width: 18px; height: 18px; fill: var(--gold); }
+
+    /* ── Welcome ── */
+    .welcome {
+      background: var(--navy);
+      text-align: center;
+    }
+    .welcome-inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .welcome-inner p {
+      font-size: 1.05rem;
+      color: var(--cream);
+      margin-bottom: 1.5rem;
+      opacity: 0.85;
+    }
+    .welcome-inner p:first-of-type {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: var(--gold-light);
+      opacity: 1;
+    }
+    .welcome-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    .feature-item {
+      text-align: center;
+      padding: 1.5rem;
+    }
+    .feature-item svg {
+      width: 40px; height: 40px;
+      fill: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .feature-item h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+    .feature-item p {
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+
+    /* ── Stars / Artists ── */
+    .stars-section {
+      background: var(--navy-dark);
+    }
+    .artists-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    .artist-card {
+      background: rgba(17,17,51,0.6);
+      border: 1px solid var(--gold-dim);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .artist-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--gold);
+    }
+    .artist-image {
+      height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .artist-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+    .artist-card:hover .artist-image img {
+      transform: scale(1.05);
+    }
+    .artist-image-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(13,13,26,0.8) 0%, transparent 50%);
+    }
+    .artist-info {
+      padding: 1.5rem;
+    }
+    .artist-role {
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.3rem;
+    }
+    .artist-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--white);
+      margin-bottom: 0.75rem;
+    }
+    .artist-info p {
+      font-size: 0.92rem;
+      color: var(--cream);
+      opacity: 0.8;
+    }
+
+    /* ── Videos ── */
+    .videos-section {
+      background: var(--navy);
+      text-align: center;
+    }
+    .placeholder-content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .placeholder-content .placeholder-icon {
+      width: 80px; height: 80px;
+      margin: 0 auto 1.5rem;
+      border: 2px solid var(--gold-dim);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .placeholder-content .placeholder-icon svg {
+      width: 32px; height: 32px;
+      fill: var(--gold);
+    }
+    .placeholder-content h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+    .placeholder-content p {
+      font-size: 1rem;
+      color: var(--cream);
+      opacity: 0.8;
+      margin-bottom: 1.5rem;
+    }
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border: 1px solid var(--gold-dim);
+      border-radius: 2px;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--gold);
+      transition: all 0.3s;
+    }
+    .social-link:hover {
+      background: var(--gold-dim);
+      border-color: var(--gold);
+    }
+    .social-link svg { width: 18px; height: 18px; fill: var(--gold); }
+
+    /* ── Live ── */
+    .live-section {
+      background: var(--navy-dark);
+      text-align: center;
+    }
+    .live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      border: 1px solid #555;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 1.5rem;
+    }
+    .live-dot {
+      width: 8px; height: 8px;
+      background: #555;
+      border-radius: 50%;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      background: rgba(8,8,18,0.95);
+      border-top: 1px solid var(--gold-dim);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .footer-logo svg { height: 32px; }
+    .footer-logo span {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .footer-text {
+      font-size: 0.85rem;
+      color: var(--cream);
+      opacity: 0.5;
+      margin-bottom: 0.5rem;
+    }
+    .footer .social-links { margin-bottom: 1.5rem; }
+
+    /* ── Animations ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .navbar { padding: 0.8rem 1.5rem; }
+      .nav-links {
+        position: fixed;
+        top: 0; right: -100%;
+        width: 280px; height: 100vh;
+        background: var(--navy-dark);
+        flex-direction: column;
+        justify-content: center;
+        gap: 2rem;
+        transition: right 0.3s;
+        border-left: 1px solid var(--gold-dim);
+      }
+      .nav-links.open { right: 0; }
+      .menu-toggle { display: flex; }
+      section { padding: 4rem 1.5rem; }
+      .artists-grid { grid-template-columns: 1fr; }
+      .social-links { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ── -->
+  <nav class="navbar" id="navbar">
+    <a href="#home" class="nav-brand">
+      <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+        <g fill="#c9a84c">
+          <!-- Tent -->
+          <path d="M25 5 L25 2 L27 4 L25 5Z"/>
+          <path d="M25 5 Q15 20 8 32 L17 32 Q20 22 25 14 Q30 22 33 32 L42 32 Q35 20 25 5Z" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+          <path d="M25 5 Q15 20 8 32 L17 32 Q20 22 25 14 Q30 22 33 32 L42 32 Q35 20 25 5Z"/>
+          <line x1="8" y1="32" x2="42" y2="32" stroke="#c9a84c" stroke-width="1.5"/>
+          <!-- Tent stripes -->
+          <path d="M18 28 Q20 20 25 14 L22 18 Q18 24 16 32" opacity="0.3"/>
+          <path d="M32 28 Q30 20 25 14 L28 18 Q32 24 34 32" opacity="0.3"/>
+          <!-- Stars -->
+          <circle cx="12" cy="12" r="1.2"/>
+          <circle cx="38" cy="10" r="1"/>
+          <circle cx="8" cy="22" r="0.8"/>
+          <circle cx="42" cy="20" r="1"/>
+          <circle cx="32" cy="8" r="0.8"/>
+        </g>
+      </svg>
+      <span>Cirque Etoile</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#videos">Videos</a></li>
+      <li><a href="#stars">Stars</a></li>
+      <li><a href="#live">Live</a></li>
+      <li><a href="#" class="btn-tickets">Get Tickets</a></li>
+    </ul>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <section class="hero" id="home">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="stars-decoration">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <div class="hero-content">
+      <h1>Cirque Etoile</h1>
+      <p>A Modern Circus Without Animals</p>
+      <a href="#" class="hero-cta">Get Tickets</a>
+    </div>
+  </section>
+
+  <!-- ── Welcome ── -->
+  <section class="welcome" id="welcome">
+    <div class="section-title">Welcome to Cirque Etoile</div>
+    <div class="section-divider">
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7-6.3-4.6-6.3 4.6 2.3-7-6-4.6h7.6z"/></svg>
+    </div>
+    <div class="welcome-inner fade-in">
+      <p>Where imagination meets reality.</p>
+      <p>Located in the heart of Cologne, Cirque Etoile is more than just a circus. It is a permanent entertainment destination that combines breathtaking performances with a vibrant leisure experience. Here, art, movement, music, and emotion come together to create unforgettable moments for visitors of all ages.</p>
+      <p>Our circus is proudly animal-free, focusing entirely on the incredible talents of human performers. From acrobatics and aerial artistry to dance and visual storytelling, every show is designed to inspire and amaze.</p>
+      <p>Step into a world of lights, stars, and endless wonder &mdash; welcome to Cirque Etoile.</p>
+    </div>
+    <div class="welcome-features fade-in">
+      <div class="feature-item">
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7-6.3-4.6-6.3 4.6 2.3-7-6-4.6h7.6z"/></svg>
+        <h3>World-Class Artists</h3>
+        <p>Incredible performers from around the globe</p>
+      </div>
+      <div class="feature-item">
+        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <h3>Animal-Free</h3>
+        <p>100% focused on human talent and creativity</p>
+      </div>
+      <div class="feature-item">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        <h3>Music & Emotion</h3>
+        <p>Live soundscapes that move your soul</p>
+      </div>
+      <div class="feature-item">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        <h3>Cologne</h3>
+        <p>A permanent home in the heart of Germany</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stars / Artists ── -->
+  <section class="stars-section" id="stars">
+    <div class="section-title">Our Stars</div>
+    <div class="section-divider">
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7-6.3-4.6-6.3 4.6 2.3-7-6-4.6h7.6z"/></svg>
+    </div>
+    <div class="artists-grid">
+
+      <!-- Luna Moreau -->
+      <div class="artist-card fade-in">
+        <div class="artist-image">
+          <img src="https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=600&h=400&fit=crop&crop=top" alt="Aerial Artist" loading="lazy">
+          <div class="artist-image-overlay"></div>
+        </div>
+        <div class="artist-info">
+          <div class="artist-role">Aerial Artist</div>
+          <div class="artist-name">Luna Moreau</div>
+          <p>Luna is our queen of the skies. With grace and strength, she performs breathtaking aerial silk routines high above the stage. Her performances tell emotional stories through movement, leaving the audience in awe every night.</p>
+        </div>
+      </div>
+
+      <!-- Mateo Silva -->
+      <div class="artist-card fade-in">
+        <div class="artist-image">
+          <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&h=400&fit=crop" alt="Acrobat" loading="lazy">
+          <div class="artist-image-overlay"></div>
+        </div>
+        <div class="artist-info">
+          <div class="artist-role">Acrobat</div>
+          <div class="artist-name">Mateo Silva</div>
+          <p>Mateo is known for his explosive energy and fearless acrobatics. Whether it's flips, jumps, or complex group routines, he brings power and excitement to every performance.</p>
+        </div>
+      </div>
+
+      <!-- Aria Novak -->
+      <div class="artist-card fade-in">
+        <div class="artist-image">
+          <img src="https://images.unsplash.com/photo-1508807526345-15e9b5f4eaff?w=600&h=400&fit=crop" alt="Contortionist" loading="lazy">
+          <div class="artist-image-overlay"></div>
+        </div>
+        <div class="artist-info">
+          <div class="artist-role">Contortionist</div>
+          <div class="artist-name">Aria Novak</div>
+          <p>Aria pushes the limits of the human body. Her elegant and mesmerizing contortion acts combine flexibility, control, and artistic expression in a truly unique way.</p>
+        </div>
+      </div>
+
+      <!-- Leo Zhang -->
+      <div class="artist-card fade-in">
+        <div class="artist-image">
+          <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&h=400&fit=crop" alt="Juggler" loading="lazy">
+          <div class="artist-image-overlay"></div>
+        </div>
+        <div class="artist-info">
+          <div class="artist-role">Juggler</div>
+          <div class="artist-name">Leo Zhang</div>
+          <p>Leo transforms juggling into an art form. With perfect precision and creative choreography, he creates fast-paced, visually stunning performances that captivate the audience.</p>
+        </div>
+      </div>
+
+      <!-- Nico Rossi -->
+      <div class="artist-card fade-in">
+        <div class="artist-image">
+          <img src="https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=600&h=400&fit=crop" alt="Clown & Performer" loading="lazy">
+          <div class="artist-image-overlay"></div>
+        </div>
+        <div class="artist-info">
+          <div class="artist-role">Clown & Performer</div>
+          <div class="artist-name">Nico Rossi</div>
+          <p>Nico brings laughter and charm to Cirque Etoile. With a mix of comedy, improvisation, and audience interaction, he creates unforgettable moments full of joy.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Videos ── -->
+  <section class="videos-section" id="videos">
+    <div class="section-title">Videos</div>
+    <div class="section-divider">
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7-6.3-4.6-6.3 4.6 2.3-7-6-4.6h7.6z"/></svg>
+    </div>
+    <div class="placeholder-content fade-in">
+      <div class="placeholder-icon">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <h3>Coming Soon</h3>
+      <p>Currently, there are no videos available. But don't worry &mdash; exciting content is on the way! In the meantime, follow us on Instagram and TikTok to get exclusive behind-the-scenes insights, artist highlights, and short performance clips.</p>
+      <p>Stay tuned and become part of the Cirque Etoile experience!</p>
+      <div class="social-links">
+        <a href="#" class="social-link">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          Instagram
+        </a>
+        <a href="#" class="social-link">
+          <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.87a8.16 8.16 0 004.77 1.52V7a4.85 4.85 0 01-1.01-.31z"/></svg>
+          TikTok
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Live ── -->
+  <section class="live-section" id="live">
+    <div class="section-title">Live</div>
+    <div class="section-divider">
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7-6.3-4.6-6.3 4.6 2.3-7-6-4.6h7.6z"/></svg>
+    </div>
+    <div class="placeholder-content fade-in">
+      <div class="live-indicator">
+        <span class="live-dot"></span>
+        Currently Offline
+      </div>
+      <h3>We are currently not live.</h3>
+      <p>However, you can stay connected with us through Instagram and TikTok, where we regularly share updates, live moments, and exclusive content from our world.</p>
+      <p>Follow us and never miss a moment at Cirque Etoile!</p>
+      <div class="social-links">
+        <a href="#" class="social-link">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          Instagram
+        </a>
+        <a href="#" class="social-link">
+          <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.87a8.16 8.16 0 004.77 1.52V7a4.85 4.85 0 01-1.01-.31z"/></svg>
+          TikTok
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="footer-logo">
+      <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+        <g fill="#c9a84c">
+          <path d="M25 5 L25 2 L27 4 L25 5Z"/>
+          <path d="M25 5 Q15 20 8 32 L17 32 Q20 22 25 14 Q30 22 33 32 L42 32 Q35 20 25 5Z"/>
+          <line x1="8" y1="32" x2="42" y2="32" stroke="#c9a84c" stroke-width="1.5"/>
+          <circle cx="12" cy="12" r="1.2"/>
+          <circle cx="38" cy="10" r="1"/>
+          <circle cx="8" cy="22" r="0.8"/>
+          <circle cx="42" cy="20" r="1"/>
+          <circle cx="32" cy="8" r="0.8"/>
+        </g>
+      </svg>
+      <span>Cirque Etoile</span>
+    </div>
+    <div class="social-links" style="margin-bottom: 1.5rem;">
+      <a href="#" class="social-link">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        Instagram
+      </a>
+      <a href="#" class="social-link">
+        <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.87a8.16 8.16 0 004.77 1.52V7a4.85 4.85 0 01-1.01-.31z"/></svg>
+        TikTok
+      </a>
+    </div>
+    <p class="footer-text">Cologne, Germany</p>
+    <p class="footer-text">&copy; 2026 Cirque Etoile. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Mobile menu toggle
+    document.getElementById('menuToggle').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+
+    // Close mobile menu on link click
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('navLinks').classList.remove('open');
+      });
+    });
+
+    // Fade-in on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
