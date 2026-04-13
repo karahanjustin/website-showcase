@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blossom Caf&eacute;</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --cream: #FFF8F0;
+      --blush: #FADADD;
+      --pink: #F4C2C2;
+      --rose: #D4A0A0;
+      --dusty-rose: #C48B8B;
+      --brown: #5C3D2E;
+      --brown-light: #7A5C4F;
+      --gold: #C9A96E;
+      --white: #FFFFFF;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      color: var(--brown);
+      background: var(--cream);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+      background: rgba(255, 248, 240, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(244, 194, 194, 0.3);
+      transition: box-shadow 0.3s;
+    }
+
+    nav.scrolled { box-shadow: 0 2px 20px rgba(92, 61, 46, 0.08); }
+
+    nav .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--dusty-rose);
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+
+    nav .logo span { color: var(--gold); }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 32px;
+    }
+
+    nav ul a {
+      text-decoration: none;
+      color: var(--brown-light);
+      font-size: 0.85rem;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    nav ul a:hover { color: var(--dusty-rose); }
+
+    .mobile-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .mobile-toggle span {
+      width: 24px;
+      height: 2px;
+      background: var(--brown);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(255,248,240,0.3) 0%, rgba(255,248,240,0.85) 100%),
+        url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1600&q=80') center/cover no-repeat;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 20%, rgba(250, 218, 221, 0.4) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 80%, rgba(244, 194, 194, 0.3) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+    }
+
+    .hero-content .petal {
+      font-size: 0.85rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--dusty-rose);
+      margin-bottom: 16px;
+    }
+
+    .hero-content h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 700;
+      color: var(--brown);
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .hero-content h1 em {
+      font-style: italic;
+      color: var(--dusty-rose);
+    }
+
+    .hero-content p {
+      font-size: 1.15rem;
+      color: var(--brown-light);
+      max-width: 480px;
+      margin: 0 auto 36px;
+      font-weight: 300;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 40px;
+      border-radius: 50px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--dusty-rose);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: var(--rose);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(196, 139, 139, 0.35);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--dusty-rose);
+      border: 2px solid var(--pink);
+    }
+
+    .btn-outline:hover {
+      background: var(--blush);
+      transform: translateY(-2px);
+    }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 100px 24px; }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-header .label {
+      font-size: 0.75rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--dusty-rose);
+      margin-bottom: 12px;
+    }
+
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: var(--brown);
+      font-weight: 600;
+    }
+
+    .section-header .divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--pink), var(--gold));
+      margin: 20px auto 0;
+      border-radius: 2px;
+    }
+
+    /* ── MENU ── */
+    .menu { background: var(--white); }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 28px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .menu-card {
+      background: var(--cream);
+      border-radius: 20px;
+      padding: 32px 28px;
+      text-align: center;
+      transition: all 0.4s;
+      border: 1px solid rgba(244, 194, 194, 0.2);
+    }
+
+    .menu-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 36px rgba(196, 139, 139, 0.15);
+      border-color: var(--pink);
+    }
+
+    .menu-card .icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto 16px;
+      border: 3px solid var(--pink);
+    }
+
+    .menu-card .icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .menu-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--brown);
+      margin-bottom: 8px;
+    }
+
+    .menu-card .desc {
+      font-size: 0.88rem;
+      color: var(--brown-light);
+      margin-bottom: 16px;
+      font-weight: 300;
+    }
+
+    .menu-card .price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--dusty-rose);
+      font-weight: 600;
+    }
+
+    /* ── ABOUT ── */
+    .about {
+      background: var(--cream);
+    }
+
+    .about-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+      align-items: center;
+    }
+
+    .about-image {
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .about-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      min-height: 400px;
+    }
+
+    .about-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      border: 3px solid rgba(244, 194, 194, 0.3);
+      pointer-events: none;
+    }
+
+    .about-text h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--brown);
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
+
+    .about-text h3 em { color: var(--dusty-rose); font-style: italic; }
+
+    .about-text p {
+      color: var(--brown-light);
+      margin-bottom: 16px;
+      font-weight: 300;
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+
+    .about-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .about-feature {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--brown);
+    }
+
+    .about-feature .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--pink);
+      flex-shrink: 0;
+    }
+
+    /* ── GALLERY ── */
+    .gallery { background: var(--white); }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 260px);
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .gallery-grid .g-item {
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .gallery-grid .g-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s;
+    }
+
+    .gallery-grid .g-item:hover img {
+      transform: scale(1.08);
+    }
+
+    .gallery-grid .g-item::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(92,61,46,0.2) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .gallery-grid .g-item:hover::after { opacity: 1; }
+
+    .gallery-grid .g-item:first-child {
+      grid-row: span 2;
+    }
+
+    /* ── CONTACT ── */
+    .contact { background: var(--blush); }
+
+    .contact-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .contact-card {
+      text-align: center;
+      padding: 40px 24px;
+      background: var(--white);
+      border-radius: 20px;
+      border: 1px solid rgba(244, 194, 194, 0.3);
+    }
+
+    .contact-card .c-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 1.4rem;
+    }
+
+    .contact-card h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--brown);
+      margin-bottom: 10px;
+    }
+
+    .contact-card p {
+      color: var(--brown-light);
+      font-size: 0.9rem;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--brown);
+      color: rgba(255, 248, 240, 0.7);
+      text-align: center;
+      padding: 40px 24px;
+      font-size: 0.85rem;
+    }
+
+    footer .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--pink);
+      margin-bottom: 8px;
+    }
+
+    footer .socials {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    footer .socials a {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid rgba(244, 194, 194, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--pink);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+    }
+
+    footer .socials a:hover {
+      background: var(--dusty-rose);
+      color: var(--white);
+      border-color: var(--dusty-rose);
+    }
+
+    /* ── ANIMATIONS ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav ul { display: none; }
+      .mobile-toggle { display: flex; }
+
+      nav ul.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 248, 240, 0.97);
+        backdrop-filter: blur(12px);
+        padding: 24px 32px;
+        gap: 20px;
+        border-bottom: 1px solid rgba(244, 194, 194, 0.3);
+      }
+
+      .about-inner { grid-template-columns: 1fr; }
+      .about-image img { min-height: 300px; }
+
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 240px 240px 240px;
+      }
+
+      .gallery-grid .g-item:first-child {
+        grid-column: span 2;
+        grid-row: span 1;
+      }
+
+      .contact-inner { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .gallery-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+
+      .gallery-grid .g-item:first-child {
+        grid-column: span 1;
+      }
+
+      .gallery-grid .g-item { height: 220px; }
+
+      .menu-grid { grid-template-columns: 1fr; }
+
+      .about-features { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="logo">Blossom <span>&</span> Caf&eacute;</a>
+      <ul id="nav-links">
+        <li><a href="#menu">Menu</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="mobile-toggle" onclick="document.getElementById('nav-links').classList.toggle('open')" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="petal">Est. 2024 &middot; Handcrafted with love</p>
+      <h1>Blossom <em>Caf&eacute;</em></h1>
+      <p>Where every cup blooms. A cozy corner for freshly brewed coffees, homemade pastries, and quiet moments that feel like a warm hug.</p>
+      <a href="#menu" class="btn btn-primary">Explore Our Menu</a>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section class="menu" id="menu">
+    <div class="section-header fade-up">
+      <p class="label">Our Offerings</p>
+      <h2>The Menu</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-card fade-up">
+        <div class="icon"><img src="https://images.unsplash.com/photo-1541167760496-9af0ab7f0bc1?w=200&q=80" alt="Lavender Latte"></div>
+        <h3>Lavender Latte</h3>
+        <p class="desc">Espresso with steamed oat milk and a hint of dried lavender</p>
+        <p class="price">$5.50</p>
+      </div>
+      <div class="menu-card fade-up">
+        <div class="icon"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038024a?w=200&q=80" alt="Rose Croissant"></div>
+        <h3>Rose Croissant</h3>
+        <p class="desc">Flaky butter croissant filled with rose petal jam and cream</p>
+        <p class="price">$4.75</p>
+      </div>
+      <div class="menu-card fade-up">
+        <div class="icon"><img src="https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=200&q=80" alt="Honey Matcha"></div>
+        <h3>Honey Matcha</h3>
+        <p class="desc">Ceremonial grade matcha with local wildflower honey and oat milk</p>
+        <p class="price">$6.00</p>
+      </div>
+      <div class="menu-card fade-up">
+        <div class="icon"><img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=200&q=80" alt="Berry Bliss Bowl"></div>
+        <h3>Berry Bliss Bowl</h3>
+        <p class="desc">Acai and mixed berries topped with granola, honey, and edible flowers</p>
+        <p class="price">$9.50</p>
+      </div>
+      <div class="menu-card fade-up">
+        <div class="icon"><img src="https://images.unsplash.com/photo-1587668178277-295251f900ce?w=200&q=80" alt="Lemon Poppy Cake"></div>
+        <h3>Lemon Poppy Cake</h3>
+        <p class="desc">Moist lemon cake with poppy seeds and vanilla cream cheese frosting</p>
+        <p class="price">$5.25</p>
+      </div>
+      <div class="menu-card fade-up">
+        <div class="icon"><img src="https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=200&q=80" alt="Peach Iced Tea"></div>
+        <h3>Peach Iced Tea</h3>
+        <p class="desc">Cold-brewed jasmine tea with fresh peach slices and elderflower</p>
+        <p class="price">$4.50</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="section-header fade-up">
+      <p class="label">Our Story</p>
+      <h2>About Blossom</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="about-inner">
+      <div class="about-image fade-up">
+        <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80" alt="Inside Blossom Cafe">
+      </div>
+      <div class="about-text fade-up">
+        <h3>A little place with a <em>big heart</em></h3>
+        <p>Blossom Caf&eacute; started as a dream between two friends who believed that a cup of coffee should feel like coming home. Tucked away on a quiet tree-lined street, we opened our doors with a simple mission: slow down, savour the moment, and bloom.</p>
+        <p>Every pastry is baked fresh each morning. Every drink is made with locally sourced, seasonal ingredients. And every corner of our space is designed to make you feel at ease.</p>
+        <div class="about-features">
+          <div class="about-feature"><span class="dot"></span> Locally roasted beans</div>
+          <div class="about-feature"><span class="dot"></span> Baked fresh daily</div>
+          <div class="about-feature"><span class="dot"></span> Oat &amp; almond milk</div>
+          <div class="about-feature"><span class="dot"></span> Dog-friendly patio</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="gallery" id="gallery">
+    <div class="section-header fade-up">
+      <p class="label">Snapshots</p>
+      <h2>Our Gallery</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="gallery-grid fade-up">
+      <div class="g-item">
+        <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80" alt="Coffee art">
+      </div>
+      <div class="g-item">
+        <img src="https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=800&q=80" alt="Pastries display">
+      </div>
+      <div class="g-item">
+        <img src="https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=800&q=80" alt="Cozy interior">
+      </div>
+      <div class="g-item">
+        <img src="https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=800&q=80" alt="Latte closeup">
+      </div>
+      <div class="g-item">
+        <img src="https://images.unsplash.com/photo-1464979681340-bdd28a61699e?w=800&q=80" alt="Cafe atmosphere">
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="section-header fade-up">
+      <p class="label">Come Say Hello</p>
+      <h2>Visit Us</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="contact-inner">
+      <div class="contact-card fade-up">
+        <div class="c-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C48B8B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <h4>Location</h4>
+        <p>42 Rosewood Lane<br>Brooklyn, NY 11201</p>
+      </div>
+      <div class="contact-card fade-up">
+        <div class="c-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C48B8B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <h4>Hours</h4>
+        <p>Mon &ndash; Fri: 7am &ndash; 6pm<br>Sat &ndash; Sun: 8am &ndash; 7pm</p>
+      </div>
+      <div class="contact-card fade-up">
+        <div class="c-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C48B8B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <h4>Get in Touch</h4>
+        <p>hello@blossomcafe.com<br>(718) 555-0192</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Blossom Caf&eacute;</div>
+    <div class="socials">
+      <a href="#" aria-label="Instagram">IG</a>
+      <a href="#" aria-label="Facebook">FB</a>
+      <a href="#" aria-label="Pinterest">PT</a>
+    </div>
+    <p>&copy; 2026 Blossom Caf&eacute;. Made with love and a little bit of flour.</p>
+  </footer>
+
+  <script>
+    // Scroll-triggered fade-in
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // Nav shadow on scroll
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+    });
+  </script>
+</body>
+</html>
