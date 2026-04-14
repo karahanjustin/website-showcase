@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ember & Oak Steakhouse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --charcoal: #1a1714;
+      --espresso: #2c2420;
+      --leather: #8b6f4e;
+      --brass: #c9a84c;
+      --cream: #f5ede0;
+      --ember: #d4603a;
+      --smoke: #a09080;
+      --bone: #e8ddd0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--charcoal);
+      color: var(--cream);
+      font-family: 'Lora', serif;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to bottom, rgba(26,23,20,0.95), transparent);
+      transition: background 0.4s;
+    }
+
+    nav.scrolled {
+      background: rgba(26,23,20,0.97);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 30px rgba(0,0,0,0.4);
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--brass);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .logo span {
+      color: var(--ember);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--smoke);
+      text-decoration: none;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--brass);
+    }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+
+    .nav-toggle span {
+      width: 24px;
+      height: 2px;
+      background: var(--brass);
+      transition: all 0.3s;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: url('https://images.unsplash.com/photo-1544025162-d76694265947?w=1600&q=80') center/cover no-repeat;
+    }
+
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(26,23,20,0.5) 0%,
+        rgba(26,23,20,0.3) 40%,
+        rgba(26,23,20,0.7) 80%,
+        var(--charcoal) 100%
+      );
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      padding: 0 24px;
+    }
+
+    .hero-tagline {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color: var(--brass);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 1s 0.3s forwards;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 8vw, 6.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      color: var(--cream);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 1s 0.6s forwards;
+    }
+
+    .hero h1 em {
+      color: var(--ember);
+      font-style: italic;
+    }
+
+    .hero-sub {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      color: var(--smoke);
+      max-width: 500px;
+      margin: 0 auto 40px;
+      opacity: 0;
+      animation: fadeUp 1s 0.9s forwards;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 1s 1.2s forwards;
+    }
+
+    .btn {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 16px 40px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.4s;
+    }
+
+    .btn-primary {
+      background: var(--ember);
+      color: var(--cream);
+    }
+
+    .btn-primary:hover {
+      background: #b8502f;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(212,96,58,0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--brass);
+      border: 1px solid var(--brass);
+    }
+
+    .btn-outline:hover {
+      background: var(--brass);
+      color: var(--charcoal);
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 120px 24px;
+    }
+
+    .section-label {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--ember);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+
+    .section-text {
+      color: var(--smoke);
+      max-width: 560px;
+      font-size: 1rem;
+    }
+
+    /* ── STORY ── */
+    .story {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+      align-items: center;
+    }
+
+    .story-images {
+      position: relative;
+      height: 600px;
+    }
+
+    .story-images img {
+      position: absolute;
+      border-radius: 4px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .story-images img:nth-child(1) {
+      width: 65%;
+      height: 70%;
+      object-fit: cover;
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
+
+    .story-images img:nth-child(2) {
+      width: 55%;
+      height: 55%;
+      object-fit: cover;
+      bottom: 0;
+      right: 0;
+      z-index: 1;
+      border: 4px solid var(--espresso);
+    }
+
+    .story-content .section-text {
+      margin-bottom: 30px;
+    }
+
+    .story-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 40px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(139,111,78,0.3);
+    }
+
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--brass);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--smoke);
+      margin-top: 4px;
+    }
+
+    /* ── FULL-WIDTH IMAGE BREAK ── */
+    .image-break {
+      width: 100%;
+      height: 500px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .image-break img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .image-break::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        var(--charcoal) 0%,
+        rgba(26,23,20,0.2) 20%,
+        rgba(26,23,20,0.2) 80%,
+        var(--charcoal) 100%
+      );
+    }
+
+    .image-break .overlay-text {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .image-break .overlay-text blockquote {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      font-style: italic;
+      color: var(--cream);
+      max-width: 700px;
+      line-height: 1.4;
+    }
+
+    .image-break .overlay-text cite {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--brass);
+      margin-top: 20px;
+      font-style: normal;
+    }
+
+    /* ── MENU ── */
+    .menu-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .menu-section .section-text {
+      margin: 0 auto 60px;
+    }
+
+    .menu-categories {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 50px;
+      flex-wrap: wrap;
+    }
+
+    .menu-cat-btn {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 10px 24px;
+      background: transparent;
+      border: 1px solid rgba(139,111,78,0.3);
+      color: var(--smoke);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .menu-cat-btn.active,
+    .menu-cat-btn:hover {
+      background: var(--ember);
+      border-color: var(--ember);
+      color: var(--cream);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+      text-align: left;
+      border-top: 1px solid rgba(139,111,78,0.2);
+    }
+
+    .menu-item {
+      padding: 32px 40px;
+      border-bottom: 1px solid rgba(139,111,78,0.15);
+      border-right: 1px solid rgba(139,111,78,0.15);
+      transition: background 0.3s;
+    }
+
+    .menu-item:nth-child(2n) {
+      border-right: none;
+    }
+
+    .menu-item:hover {
+      background: rgba(139,111,78,0.05);
+    }
+
+    .menu-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .menu-item-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--cream);
+    }
+
+    .menu-item-price {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.85rem;
+      color: var(--brass);
+      letter-spacing: 1px;
+    }
+
+    .menu-item-desc {
+      font-size: 0.9rem;
+      color: var(--smoke);
+      line-height: 1.6;
+    }
+
+    .menu-item-tag {
+      display: inline-block;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ember);
+      border: 1px solid rgba(212,96,58,0.3);
+      padding: 2px 10px;
+      margin-top: 10px;
+    }
+
+    /* ── GALLERY ── */
+    .gallery {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .gallery-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .gallery-header .section-text {
+      margin: 0 auto;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(3, 200px);
+      gap: 12px;
+    }
+
+    .gallery-item {
+      overflow: hidden;
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.08);
+    }
+
+    .gallery-item:nth-child(1) { grid-column: 1 / 3; grid-row: 1 / 3; }
+    .gallery-item:nth-child(2) { grid-column: 3; grid-row: 1; }
+    .gallery-item:nth-child(3) { grid-column: 4; grid-row: 1 / 3; }
+    .gallery-item:nth-child(4) { grid-column: 3; grid-row: 2; }
+    .gallery-item:nth-child(5) { grid-column: 1; grid-row: 3; }
+    .gallery-item:nth-child(6) { grid-column: 2 / 4; grid-row: 3; }
+    .gallery-item:nth-child(7) { grid-column: 4; grid-row: 3; }
+
+    /* ── EXPERIENCE (dual image + text) ── */
+    .experience {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .exp-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      margin-bottom: 100px;
+    }
+
+    .exp-row:nth-child(even) .exp-image { order: 2; }
+    .exp-row:nth-child(even) .exp-content { order: 1; }
+
+    .exp-image {
+      height: 450px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .exp-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s;
+    }
+
+    .exp-image:hover img {
+      transform: scale(1.04);
+    }
+
+    .exp-content .section-text {
+      margin-bottom: 24px;
+    }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials {
+      background: var(--espresso);
+      text-align: center;
+    }
+
+    .testimonials-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .testimonial-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-top: 60px;
+    }
+
+    .testimonial-card {
+      background: rgba(26,23,20,0.6);
+      padding: 40px 30px;
+      border-radius: 4px;
+      border: 1px solid rgba(139,111,78,0.15);
+      text-align: left;
+    }
+
+    .testimonial-card .stars {
+      color: var(--brass);
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    .testimonial-card p {
+      font-style: italic;
+      color: var(--bone);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .testimonial-card .author {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--smoke);
+    }
+
+    /* ── RESERVATION ── */
+    .reservation {
+      position: relative;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .reservation-bg {
+      position: absolute;
+      inset: 0;
+      background: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80') center/cover no-repeat;
+      filter: brightness(0.25);
+    }
+
+    .reservation-content {
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .reservation-content .section-text {
+      margin: 0 auto 40px;
+    }
+
+    .res-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .res-form input,
+    .res-form select {
+      font-family: 'Lora', serif;
+      font-size: 0.9rem;
+      padding: 16px 20px;
+      background: rgba(26,23,20,0.8);
+      border: 1px solid rgba(139,111,78,0.3);
+      color: var(--cream);
+      transition: border-color 0.3s;
+    }
+
+    .res-form input::placeholder { color: var(--smoke); }
+
+    .res-form input:focus,
+    .res-form select:focus {
+      outline: none;
+      border-color: var(--brass);
+    }
+
+    .res-form .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .res-form .btn {
+      grid-column: 1 / -1;
+    }
+
+    /* ── INSTAGRAM STRIP ── */
+    .insta-strip {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      height: 250px;
+      overflow: hidden;
+    }
+
+    .insta-strip a {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .insta-strip img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    .insta-strip a:hover img {
+      transform: scale(1.1);
+    }
+
+    .insta-strip a::after {
+      content: '@ember.oak';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(26,23,20,0.7);
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--brass);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .insta-strip a:hover::after {
+      opacity: 1;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #0f0d0b;
+      padding: 80px 24px 40px;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 60px;
+    }
+
+    .footer-brand .logo {
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .footer-brand p {
+      color: var(--smoke);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .footer-col h4 {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--brass);
+      margin-bottom: 20px;
+    }
+
+    .footer-col ul {
+      list-style: none;
+    }
+
+    .footer-col li {
+      margin-bottom: 12px;
+    }
+
+    .footer-col a {
+      color: var(--smoke);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.3s;
+    }
+
+    .footer-col a:hover { color: var(--cream); }
+
+    .footer-col p {
+      color: var(--smoke);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 30px;
+      border-top: 1px solid rgba(139,111,78,0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    .footer-bottom a {
+      color: #666;
+      text-decoration: none;
+    }
+
+    /* ── SCROLL ANIMATIONS ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s, transform 0.8s;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      width: 60px;
+      height: 2px;
+      background: var(--ember);
+      margin: 20px 0;
+    }
+
+    .divider-center {
+      margin: 20px auto;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .story { grid-template-columns: 1fr; gap: 40px; }
+      .story-images { height: 400px; }
+      .exp-row { grid-template-columns: 1fr; gap: 30px; }
+      .exp-row:nth-child(even) .exp-image { order: 0; }
+      .exp-row:nth-child(even) .exp-content { order: 0; }
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+      }
+      .gallery-item:nth-child(1) { grid-column: 1 / 3; grid-row: auto; }
+      .gallery-item:nth-child(3) { grid-column: auto; grid-row: auto; }
+      .gallery-item:nth-child(6) { grid-column: auto; grid-row: auto; }
+      .footer-inner { grid-template-columns: 1fr 1fr; }
+      .testimonial-cards { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+      nav.open .nav-links {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(26,23,20,0.97);
+        padding: 24px 40px;
+        gap: 20px;
+      }
+      .menu-grid { grid-template-columns: 1fr; }
+      .menu-item { border-right: none; }
+      .res-form { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; }
+      .insta-strip { grid-template-columns: repeat(3, 1fr); height: 180px; }
+      .insta-strip a:nth-child(n+4) { display: none; }
+      .footer-inner { grid-template-columns: 1fr; gap: 40px; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+      .image-break { height: 350px; }
+    }
+
+    @media (max-width: 480px) {
+      section { padding: 80px 20px; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .gallery-item:nth-child(1) { grid-column: auto; }
+      .story-images { height: 300px; }
+      .exp-image { height: 300px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="logo">Ember <span>&</span> Oak</div>
+    <ul class="nav-links">
+      <li><a href="#story">Our Story</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#reservation">Reserve</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <p class="hero-tagline">Est. 2018 -- Portland, Oregon</p>
+      <h1>Aged by Time.<br><em>Fired</em> by Passion.</h1>
+      <p class="hero-sub">Dry-aged steaks, craft cocktails, and the warmth of open flame. An honest kitchen for those who know the difference.</p>
+      <div class="hero-buttons">
+        <a href="#reservation" class="btn btn-primary">Reserve a Table</a>
+        <a href="#menu" class="btn btn-outline">View the Menu</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY -->
+  <section id="story">
+    <div class="story">
+      <div class="story-images reveal">
+        <img src="https://images.unsplash.com/photo-1560624052-449f5ddf0c31?w=800&q=80" alt="Butcher preparing meat">
+        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80" alt="Plated steak dish">
+      </div>
+      <div class="story-content reveal">
+        <p class="section-label">Our Story</p>
+        <h2 class="section-title">Born from Fire,<br>Built on Craft</h2>
+        <div class="divider"></div>
+        <p class="section-text">
+          What started as a butcher's obsession with dry-aging became a restaurant that refuses to cut corners. Every cut in our aging room hangs for a minimum of 45 days. Every sauce is built from scratch. Every cocktail is stirred with intention.
+        </p>
+        <p class="section-text">
+          We source whole animals from ranches within 200 miles, break them down in-house, and honor every part. The result is a flavor you won't find in any chain, any shortcut, any place that treats beef like a commodity.
+        </p>
+        <div class="story-stats">
+          <div>
+            <div class="stat-number">45+</div>
+            <div class="stat-label">Days Dry-Aged</div>
+          </div>
+          <div>
+            <div class="stat-number">12</div>
+            <div class="stat-label">Local Ranches</div>
+          </div>
+          <div>
+            <div class="stat-number">8</div>
+            <div class="stat-label">Years Running</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMAGE BREAK 1 -->
+  <div class="image-break">
+    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1600&q=80" alt="Restaurant interior ambiance">
+    <div class="overlay-text">
+      <blockquote>"The measure of a steakhouse is not the sizzle, but the silence after the first bite."</blockquote>
+      <cite>-- James Calloway, Head Chef</cite>
+    </div>
+  </div>
+
+  <!-- MENU -->
+  <section id="menu">
+    <div class="menu-section">
+      <p class="section-label">The Menu</p>
+      <h2 class="section-title">Honest Cuts, No Shortcuts</h2>
+      <div class="divider divider-center"></div>
+      <p class="section-text">Our menu changes with the seasons and the harvest. These are the cuts and plates that define us.</p>
+
+      <div class="menu-categories">
+        <button class="menu-cat-btn active">Steaks</button>
+        <button class="menu-cat-btn">Starters</button>
+        <button class="menu-cat-btn">Sides</button>
+        <button class="menu-cat-btn">Cocktails</button>
+      </div>
+
+      <div class="menu-grid">
+        <div class="menu-item reveal">
+          <div class="menu-item-header">
+            <span class="menu-item-name">Bone-In Ribeye</span>
+            <span class="menu-item-price">$68</span>
+          </div>
+          <p class="menu-item-desc">22oz, 60-day dry-aged, served with bone marrow butter and charred shallots.</p>
+          <span class="menu-item-tag">Chef's Pick</span>
+        </div>
+
+        <div class="menu-item reveal">
+          <div class="menu-item-header">
+            <span class="menu-item-name">Filet Mignon</span>
+            <span class="menu-item-price">$62</span>
+          </div>
+          <p class="menu-item-desc">10oz center-cut, wrapped in heritage bacon, peppercorn demi-glace.</p>
+        </div>
+
+        <div class="menu-item reveal">
+          <div class="menu-item-header">
+            <span class="menu-item-name">Tomahawk</span>
+            <span class="menu-item-price">$95</span>
+          </div>
+          <p class="menu-item-desc">36oz frenched bone-in ribeye, 45-day aged, herb compound butter. For the table.</p>
+          <span class="menu-item-tag">Signature</span>
+        </div>
+
+        <div class="menu-item reveal">
+          <div class="menu-item-header">
+            <span class="menu-item-name">NY Strip</span>
+            <span class="menu-item-price">$54</span>
+          </div>
+          <p class="menu-item-desc">16oz prime strip, bold sear, roasted garlic jus, smoked salt flake finish.</p>
+        </div>
+
+        <div class="menu-item reveal">
+          <div class="menu-item-header">
+            <span class="menu-item-name">Hanger Steak</span>
+            <span class="menu-item-price">$38</span>
+          </div>
+          <p class="menu-item-desc">The butcher's secret. Chimichurri, pickled red onion, grilled lemon.</p>
+          <span class="menu-item-tag">Staff Favorite</span>
+        </div>
+
+        <div class="menu-item reveal">
+          <div class="menu-item-header">
+            <span class="menu-item-name">Wagyu Flat Iron</span>
+            <span class="menu-item-price">$72</span>
+          </div>
+          <p class="menu-item-desc">A5 Japanese wagyu, lightly seared, ponzu glaze, toasted sesame, chive oil.</p>
+        </div>
+
+        <div class="menu-item reveal">
+          <div class="menu-item-header">
+            <span class="menu-item-name">Bone Marrow & Toast</span>
+            <span class="menu-item-price">$22</span>
+          </div>
+          <p class="menu-item-desc">Roasted split bones, parsley-caper gremolata, grilled sourdough.</p>
+        </div>
+
+        <div class="menu-item reveal">
+          <div class="menu-item-header">
+            <span class="menu-item-name">Old Fashioned</span>
+            <span class="menu-item-price">$16</span>
+          </div>
+          <p class="menu-item-desc">Buffalo Trace, demerara, house bitters, smoked with applewood at the table.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMAGE BREAK 2 -->
+  <div class="image-break">
+    <img src="https://images.unsplash.com/photo-1558030006-450675393462?w=1600&q=80" alt="Cocktail being crafted">
+    <div class="overlay-text">
+      <blockquote>"We don't follow trends. We follow flavor."</blockquote>
+      <cite>-- Ember & Oak Philosophy</cite>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <div class="gallery">
+      <div class="gallery-header reveal">
+        <p class="section-label">The Gallery</p>
+        <h2 class="section-title">A Glimpse Inside</h2>
+        <div class="divider divider-center"></div>
+        <p class="section-text">Dark wood, candlelight, the glow of an open kitchen. This is where the evening unfolds.</p>
+      </div>
+
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=900&q=80" alt="Steak on grill">
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80" alt="Restaurant dining room">
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&q=80" alt="Craft cocktail">
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=600&q=80" alt="Plated steak">
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=600&q=80" alt="Rustic bar">
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=80" alt="Fine dining plate">
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1550966871-3ed3cdb51f3a?w=600&q=80" alt="Wine cellar">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="experience">
+      <div class="exp-row">
+        <div class="exp-image reveal">
+          <img src="https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=800&q=80" alt="Dry aging room">
+        </div>
+        <div class="exp-content reveal">
+          <p class="section-label">The Craft</p>
+          <h2 class="section-title">Our Aging Room</h2>
+          <div class="divider"></div>
+          <p class="section-text">
+            Behind a glass wall in the dining room, our aging room is on full display. Himalayan salt bricks line the walls. Whole primals hang in carefully controlled air at 34 degrees and 85% humidity.
+          </p>
+          <p class="section-text">
+            We don't rush the process. The minimum hang time is 45 days, and some cuts rest for over 90. It's the kind of patience that most restaurants can't afford -- and that you can taste.
+          </p>
+        </div>
+      </div>
+
+      <div class="exp-row">
+        <div class="exp-image reveal">
+          <img src="https://images.unsplash.com/photo-1574096079513-d8259312b785?w=800&q=80" alt="Open flame grill">
+        </div>
+        <div class="exp-content reveal">
+          <p class="section-label">The Fire</p>
+          <h2 class="section-title">Wood-Fired, Always</h2>
+          <div class="divider"></div>
+          <p class="section-text">
+            No gas grills. No broilers. We cook every steak over a live fire of Oregon white oak and Pacific madrone. The wood is split by hand, dried for six months, and burned to the exact stage of ember we need.
+          </p>
+          <p class="section-text">
+            Our grill master reads the fire the way a sommelier reads a vintage. Temperature, smoke, timing -- it's instinct built on years of practice.
+          </p>
+        </div>
+      </div>
+
+      <div class="exp-row">
+        <div class="exp-image reveal">
+          <img src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=800&q=80" alt="Bartender crafting cocktail">
+        </div>
+        <div class="exp-content reveal">
+          <p class="section-label">The Bar</p>
+          <h2 class="section-title">Cocktails with Conviction</h2>
+          <div class="divider"></div>
+          <p class="section-text">
+            Our bar program is built on the same philosophy as our kitchen: quality ingredients, zero shortcuts. House-made syrups, hand-cut ice, and spirits chosen for character over brand recognition.
+          </p>
+          <p class="section-text">
+            Ask for the Ember Old Fashioned, smoked tableside with applewood, or the Oak Manhattan with a 10-year bourbon and walnut bitters. Every drink is built to complement the richness of the table.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <div class="testimonials-inner">
+      <p class="section-label">What They Say</p>
+      <h2 class="section-title">From Our Guests</h2>
+      <div class="divider divider-center"></div>
+
+      <div class="testimonial-cards">
+        <div class="testimonial-card reveal">
+          <div class="stars">* * * * *</div>
+          <p>"I've eaten at steakhouses in New York, Tokyo, and Buenos Aires. Ember & Oak is the one I keep coming back to. The 60-day ribeye changed what I thought beef could taste like."</p>
+          <span class="author">Michael R. -- Portland</span>
+        </div>
+
+        <div class="testimonial-card reveal">
+          <div class="stars">* * * * *</div>
+          <p>"Everything here feels intentional. The lighting, the music, the way the server describes each cut. It's not pretentious -- it's people who genuinely love what they do."</p>
+          <span class="author">Sarah K. -- Seattle</span>
+        </div>
+
+        <div class="testimonial-card reveal">
+          <div class="stars">* * * * *</div>
+          <p>"We had the tomahawk for our anniversary. They brought it out on a wooden board with a candle. My wife cried. That's not a joke. Best meal of our lives."</p>
+          <span class="author">David & Lin T. -- San Francisco</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESERVATION -->
+  <section id="reservation" class="reservation">
+    <div class="reservation-bg"></div>
+    <div class="reservation-content reveal">
+      <p class="section-label">Reservations</p>
+      <h2 class="section-title">Join Us at the Table</h2>
+      <div class="divider divider-center"></div>
+      <p class="section-text">Reservations are recommended, especially on weekends. Walk-ins welcome at the bar.</p>
+
+      <form class="res-form" onsubmit="event.preventDefault();">
+        <input type="text" placeholder="Full Name" required>
+        <input type="email" placeholder="Email Address" required>
+        <input type="date" required>
+        <select required>
+          <option value="" disabled selected>Party Size</option>
+          <option>1 Guest</option>
+          <option>2 Guests</option>
+          <option>3-4 Guests</option>
+          <option>5-6 Guests</option>
+          <option>7+ Guests (Private Dining)</option>
+        </select>
+        <select class="full-width">
+          <option value="" disabled selected>Preferred Time</option>
+          <option>5:00 PM</option>
+          <option>5:30 PM</option>
+          <option>6:00 PM</option>
+          <option>6:30 PM</option>
+          <option>7:00 PM</option>
+          <option>7:30 PM</option>
+          <option>8:00 PM</option>
+          <option>8:30 PM</option>
+          <option>9:00 PM</option>
+          <option>9:30 PM</option>
+        </select>
+        <button type="submit" class="btn btn-primary full-width">Request Reservation</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- INSTAGRAM STRIP -->
+  <div class="insta-strip">
+    <a href="#">
+      <img src="https://images.unsplash.com/photo-1546964124-0cce460f38ef?w=400&q=80" alt="Steak close-up">
+    </a>
+    <a href="#">
+      <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=80" alt="Food plating">
+    </a>
+    <a href="#">
+      <img src="https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&q=80" alt="Dish presentation">
+    </a>
+    <a href="#">
+      <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&q=80" alt="Cocktail detail">
+    </a>
+    <a href="#">
+      <img src="https://images.unsplash.com/photo-1432139509613-5c4255a1d916?w=400&q=80" alt="Restaurant atmosphere">
+    </a>
+    <a href="#">
+      <img src="https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&q=80" alt="Dessert plate">
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="logo">Ember <span>&</span> Oak</span>
+        <p>A Portland steakhouse dedicated to dry-aged beef, live-fire cooking, and craft cocktails. No shortcuts, no substitutes.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigate</h4>
+        <ul>
+          <li><a href="#story">Our Story</a></li>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#reservation">Reservations</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Hours</h4>
+        <p>
+          Tue -- Thu: 5pm -- 10pm<br>
+          Fri -- Sat: 5pm -- 11pm<br>
+          Sunday: 5pm -- 9pm<br>
+          Monday: Closed
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <p>
+          742 SE Hawthorne Blvd<br>
+          Portland, OR 97214<br><br>
+          (503) 555-0182<br>
+          hello@emberandoak.com
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>2026 Ember & Oak Steakhouse. All rights reserved.</span>
+      <span>Crafted with fire and patience.</span>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar scroll effect
+    const nav = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Reveal on scroll
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // Menu category buttons (visual toggle only)
+    document.querySelectorAll('.menu-cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.menu-cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>
