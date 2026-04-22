@@ -1,5 +1,5 @@
 // David — FAQ chatbot Worker for karahanjustin.github.io/website-showcase
-// Proxies to Google Gemini API. Key never exposed to browser.
+// Proxies to Groq API (OpenAI-compatible). Key never exposed to browser.
 
 const SYSTEM_PROMPT = `You are David, an FAQ assistant for Justin Karahan's freelance services website (karahanjustin.github.io/website-showcase).
 
@@ -99,45 +99,39 @@ export default {
       }
     }
 
-    // Convert messages → Gemini "contents" format
-    const contents = messages.map((m) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }],
-    }));
+    // Groq uses OpenAI-compatible chat format
+    const chatMessages = [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...messages.map((m) => ({ role: m.role, content: m.content })),
+    ];
 
-    const model = env.MODEL || "gemini-2.5-flash";
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`;
+    const model = env.MODEL || "llama-3.3-70b-versatile";
 
-    const apiRes = await fetch(url, {
+    const apiRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${env.GROQ_API_KEY}`,
+      },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents,
-        generationConfig: {
-          maxOutputTokens: 400,
-          temperature: 0.3,
-        },
-        safetySettings: [
-          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
-          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
-          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
-          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" },
-        ],
+        model,
+        messages: chatMessages,
+        max_tokens: 400,
+        temperature: 0.3,
       }),
     });
 
     if (!apiRes.ok) {
       const errText = await apiRes.text();
-      console.error("Gemini error:", apiRes.status, errText);
+      console.error("Groq error:", apiRes.status, errText);
       return json({ error: "Upstream error" }, 502, cors);
     }
 
     const data = await apiRes.json();
-    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const raw = data.choices?.[0]?.message?.content ?? "";
 
     if (!raw) {
-      console.error("Empty Gemini reply:", JSON.stringify(data));
+      console.error("Empty Groq reply:", JSON.stringify(data));
       return json({ error: "Empty reply" }, 502, cors);
     }
 
