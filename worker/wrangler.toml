@@ -1,0 +1,7 @@
+name = "david-chat"
+main = "src/index.js"
+compatibility_date = "2026-04-01"
+
+[vars]
+ALLOWED_ORIGIN = "https://karahanjustin.github.io"
+MODEL = "claude-haiku-4-5"
