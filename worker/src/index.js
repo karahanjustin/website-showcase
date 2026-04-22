@@ -1,5 +1,5 @@
 // David — FAQ chatbot Worker for karahanjustin.github.io/website-showcase
-// Proxies to Anthropic API. Key never exposed to browser.
+// Proxies to Google Gemini API. Key never exposed to browser.
 
 const SYSTEM_PROMPT = `You are David, an FAQ assistant for Justin Karahan's freelance services website (karahanjustin.github.io/website-showcase).
 
@@ -98,35 +98,48 @@ export default {
       }
     }
 
-    const apiRes = await fetch("https://api.anthropic.com/v1/messages", {
+    // Convert messages → Gemini "contents" format
+    const contents = messages.map((m) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
+    }));
+
+    const model = env.MODEL || "gemini-2.5-flash";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`;
+
+    const apiRes = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: env.MODEL || "claude-haiku-4-5",
-        max_tokens: 400,
-        system: [
-          {
-            type: "text",
-            text: SYSTEM_PROMPT,
-            cache_control: { type: "ephemeral" },
-          },
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents,
+        generationConfig: {
+          maxOutputTokens: 400,
+          temperature: 0.3,
+        },
+        safetySettings: [
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" },
         ],
-        messages,
       }),
     });
 
     if (!apiRes.ok) {
       const errText = await apiRes.text();
-      console.error("Anthropic error:", apiRes.status, errText);
+      console.error("Gemini error:", apiRes.status, errText);
       return json({ error: "Upstream error" }, 502, cors);
     }
 
     const data = await apiRes.json();
-    const text = data.content?.[0]?.text ?? "";
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+
+    if (!text) {
+      console.error("Empty Gemini reply:", JSON.stringify(data));
+      return json({ error: "Empty reply" }, 502, cors);
+    }
+
     return json({ reply: text }, 200, cors);
   },
 };
