@@ -8,18 +8,19 @@
 
   const css = `
     .david-fab {
-      position: fixed; bottom: 24px; right: 24px; z-index: 9998;
-      width: 60px; height: 60px; border-radius: 50%;
+      position: fixed; bottom: 40px; right: 40px; z-index: 9998;
+      width: 84px; height: 84px; border-radius: 50%;
       background: #0a0a0a; border: 1px solid #00f0ff;
       color: #00f0ff; font-family: 'Orbitron', sans-serif;
-      font-weight: 700; font-size: 0.7rem; letter-spacing: 2px;
+      font-weight: 700; font-size: 0.78rem; letter-spacing: 2px;
+      line-height: 1.2; padding: 0 8px;
       cursor: pointer; box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
       transition: all 0.3s;
     }
     .david-fab:hover { box-shadow: 0 0 35px rgba(0, 240, 255, 0.7); transform: scale(1.06); }
 
     .david-panel {
-      position: fixed; bottom: 100px; right: 24px; z-index: 9999;
+      position: fixed; bottom: 140px; right: 40px; z-index: 9999;
       width: min(380px, calc(100vw - 32px));
       height: min(560px, calc(100vh - 140px));
       background: #0a0a0a; border: 1px solid rgba(0, 240, 255, 0.4);
