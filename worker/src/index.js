@@ -134,16 +134,31 @@ export default {
     }
 
     const data = await apiRes.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
-    if (!text) {
+    if (!raw) {
       console.error("Empty Gemini reply:", JSON.stringify(data));
       return json({ error: "Empty reply" }, 502, cors);
     }
 
-    return json({ reply: text }, 200, cors);
+    return json({ reply: stripDashes(raw) }, 200, cors);
   },
 };
+
+// Remove dashes used as punctuation (em, en, hyphen surrounded by whitespace).
+// Keeps hyphens inside compound words like "one-pager" or "FAQ-assistant".
+function stripDashes(s) {
+  return s
+    // em/en dash with optional surrounding spaces → comma+space
+    .replace(/\s*[—–]\s*/g, ", ")
+    // hyphen-minus used as punctuation (space around it) → comma+space
+    .replace(/\s+-\s+/g, ", ")
+    // collapse any ",," or ", ," artifacts
+    .replace(/,\s*,/g, ",")
+    // tidy double spaces
+    .replace(/ {2,}/g, " ")
+    .trim();
+}
 
 function json(obj, status, cors) {
   return new Response(JSON.stringify(obj), {
